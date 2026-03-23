@@ -13,6 +13,7 @@
       font-size: 18px;
       padding: 10px 15px;
       margin: 5px;
+      cursor: pointer;
     }
     #resultado {
       font-size: 32px;
@@ -34,44 +35,43 @@
   <button onclick="selecionar('menor')">Menores</button>
 </div>
 
+<div>
+  <button onclick="setModo('quintas')">Quintas</button>
+  <button onclick="setModo('quartas')">Quartas</button>
+</div>
+
 <button onclick="sortear()">Sortear</button>
 
 <div id="resultado">—</div>
 <div id="ciclo"></div>
 
 <script>
+// =========================
+// LISTAS
+// =========================
+
 let maiores = [
-  "C",
-  "G",
-  "D",
-  "A",
-  "E",
-  "B",
-  "F♯ / G♭",
-  "D♭",
-  "A♭",
-  "E♭",
-  "B♭",
-  "F"
+  "C", "G", "D", "A", "E", "B",
+  "F♯ / G♭", "D♭", "A♭", "E♭", "B♭", "F"
 ];
 
+// ciclo de quintas em MENOR (corrigido)
 let menores = [
-  "A",
-  "E",
-  "B",
-  "F♯",
-  "C♯",
-  "G♯",
-  "D♯ / E♭",
-  "B♭",
-  "F",
-  "C",
-  "G",
-  "D"
+  "Cm", "Gm", "Dm", "Am", "Em", "Bm",
+  "F♯m", "C♯m", "G♯m", "D♯m", "A♯m", "Fm"
 ];
+
+// =========================
+// ESTADO
+// =========================
 
 let listaAtual = [];
 let embaralhadas = [];
+let modoCiclo = "quintas"; // ou "quartas"
+
+// =========================
+// FUNÇÕES
+// =========================
 
 function embaralhar(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -92,12 +92,24 @@ function selecionar(tipo) {
   document.getElementById("ciclo").innerText = "";
 }
 
+function setModo(modo) {
+  modoCiclo = modo;
+}
+
 function gerarCiclo(tonica) {
   let index = listaAtual.indexOf(tonica);
   let ciclo = [];
 
   for (let i = 0; i < listaAtual.length; i++) {
-    ciclo.push(listaAtual[(index + i) % listaAtual.length]);
+    let pos;
+
+    if (modoCiclo === "quintas") {
+      pos = (index + i) % listaAtual.length;
+    } else {
+      pos = (index - i + listaAtual.length) % listaAtual.length;
+    }
+
+    ciclo.push(listaAtual[pos]);
   }
 
   return ciclo;
@@ -117,7 +129,10 @@ function sortear() {
   document.getElementById("ciclo").innerText = ciclo.join(" → ");
 }
 
-// padrão inicial
+// =========================
+// INICIALIZAÇÃO
+// =========================
+
 listaAtual = maiores;
 iniciar();
 </script>
