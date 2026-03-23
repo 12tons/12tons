@@ -175,3 +175,143 @@ atualizarBotoesModo();
 
 </body>
 </html>
+    #ciclo {
+      margin-top: 20px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Sorteador de Tonalidades</h1>
+
+<div>
+  <button id="btn-maior" onclick="selecionar('maior')">Maiores</button>
+  <button id="btn-menor" onclick="selecionar('menor')">Menores</button>
+</div>
+
+<div>
+  <button id="btn-quintas" onclick="setModo('quintas')">Quintas</button>
+  <button id="btn-quartas" onclick="setModo('quartas')">Quartas</button>
+</div>
+
+<button onclick="sortear()">Sortear</button>
+
+<div id="resultado">—</div>
+<div id="ciclo"></div>
+
+<script>
+// =========================
+// LISTAS
+// =========================
+
+let maiores = [
+  "C", "G", "D", "A", "E", "B",
+  "F♯ / G♭", "D♭", "A♭", "E♭", "B♭", "F"
+];
+
+let menores = [
+  "Cm", "Gm", "Dm", "Am", "Em", "Bm",
+  "F♯m", "C♯m", "G♯m", "D♯m", "A♯m", "Fm"
+];
+
+// =========================
+// ESTADO
+// =========================
+
+let listaAtual = [];
+let embaralhadas = [];
+let modoCiclo = "quintas";
+
+// =========================
+// FUNÇÕES
+// =========================
+
+function embaralhar(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function iniciar() {
+  embaralhadas = [...listaAtual];
+  embaralhar(embaralhadas);
+}
+
+function atualizarBotoesTipo(tipo) {
+  document.getElementById("btn-maior").classList.remove("ativo");
+  document.getElementById("btn-menor").classList.remove("ativo");
+
+  document.getElementById("btn-" + tipo).classList.add("ativo");
+}
+
+function atualizarBotoesModo() {
+  document.getElementById("btn-quintas").classList.remove("ativo");
+  document.getElementById("btn-quartas").classList.remove("ativo");
+
+  document.getElementById("btn-" + modoCiclo).classList.add("ativo");
+}
+
+function selecionar(tipo) {
+  listaAtual = (tipo === 'maior') ? maiores : menores;
+  iniciar();
+
+  atualizarBotoesTipo(tipo);
+
+  document.getElementById("resultado").innerText = "Pronto!";
+  document.getElementById("ciclo").innerText = "";
+}
+
+function setModo(modo) {
+  modoCiclo = modo;
+  atualizarBotoesModo();
+}
+
+function gerarCiclo(tonica) {
+  let index = listaAtual.indexOf(tonica);
+  let ciclo = [];
+
+  for (let i = 0; i < listaAtual.length; i++) {
+    let pos;
+
+    if (modoCiclo === "quintas") {
+      pos = (index + i) % listaAtual.length;
+    } else {
+      pos = (index - i + listaAtual.length) % listaAtual.length;
+    }
+
+    ciclo.push(listaAtual[pos]);
+  }
+
+  return ciclo;
+}
+
+function sortear() {
+  if (embaralhadas.length === 0) {
+    document.getElementById("resultado").innerText = "Fim do ciclo!";
+    document.getElementById("ciclo").innerText = "Clique em Maiores ou Menores para recomeçar.";
+    return;
+  }
+
+  let tonica = embaralhadas.pop();
+  document.getElementById("resultado").innerText = tonica;
+
+  let ciclo = gerarCiclo(tonica);
+  document.getElementById("ciclo").innerText = ciclo.join(" → ");
+}
+
+// =========================
+// INICIALIZAÇÃO
+// =========================
+
+listaAtual = maiores;
+iniciar();
+atualizarBotoesTipo("maior");
+atualizarBotoesModo();
+
+</script>
+
+</body>
+</html>
