@@ -14,7 +14,23 @@
     }
 
     h1 {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+
+    .flags {
+      margin-bottom: 20px;
+    }
+
+    .flag {
+      font-size: 24px;
+      cursor: pointer;
+      margin: 0 5px;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .flag.ativo {
+      background-color: #222;
     }
 
     .grupo {
@@ -30,7 +46,6 @@
       background-color: white;
       color: #111;
       cursor: pointer;
-      transition: 0.2s;
     }
 
     button:hover {
@@ -68,7 +83,14 @@
 
 <body>
 
-<h1>Sorteador de Tonalidades</h1>
+<div class="flags">
+  <span class="flag ativo" onclick="setLang('pt')">🇧🇷</span>
+  <span class="flag" onclick="setLang('en')">🇬🇧</span>
+  <span class="flag" onclick="setLang('es')">🇪🇸</span>
+  <span class="flag" onclick="setLang('fr')">🇫🇷</span>
+</div>
+
+<h1 id="titulo">Sorteador de Tonalidades</h1>
 
 <div class="grupo">
   <button id="btn-maior" onclick="selecionar('maior')">Maiores</button>
@@ -86,18 +108,92 @@
 <div id="ciclo"></div>
 
 <script>
+
+// =========================
+// IDIOMAS
+// =========================
+
+let lang = "pt";
+
+const textos = {
+  pt: {
+    titulo: "Sorteador de Tonalidades",
+    maior: "Maiores",
+    menor: "Menores",
+    quintas: "Quintas",
+    quartas: "Quartas",
+    sortear: "Sortear",
+    pronto: "Pronto!",
+    fim: "Fim do ciclo!",
+    instrucao: "Clique em Maiores ou Menores."
+  },
+  en: {
+    titulo: "Key Randomizer",
+    maior: "Major",
+    menor: "Minor",
+    quintas: "Fifths",
+    quartas: "Fourths",
+    sortear: "Draw",
+    pronto: "Ready!",
+    fim: "End of cycle!",
+    instrucao: "Click Major or Minor."
+  },
+  es: {
+    titulo: "Generador de Tonalidades",
+    maior: "Mayores",
+    menor: "Menores",
+    quintas: "Quintas",
+    quartas: "Cuartas",
+    sortear: "Sortear",
+    pronto: "¡Listo!",
+    fim: "Fin del ciclo",
+    instrucao: "Haz clic en Mayores o Menores."
+  },
+  fr: {
+    titulo: "Générateur de tonalités",
+    maior: "Majeures",
+    menor: "Mineures",
+    quintas: "Quintes",
+    quartas: "Quartes",
+    sortear: "Tirer",
+    pronto: "Prêt !",
+    fim: "Fin du cycle",
+    instrucao: "Cliquez sur Majeures ou Mineures."
+  }
+};
+
+function setLang(nova) {
+  lang = nova;
+
+  document.querySelectorAll(".flag").forEach(f => f.classList.remove("ativo"));
+  event.target.classList.add("ativo");
+
+  atualizarTextos();
+}
+
+function atualizarTextos() {
+  let t = textos[lang];
+
+  document.getElementById("titulo").innerText = t.titulo;
+  document.getElementById("btn-maior").innerText = t.maior;
+  document.getElementById("btn-menor").innerText = t.menor;
+  document.getElementById("btn-quintas").innerText = t.quintas;
+  document.getElementById("btn-quartas").innerText = t.quartas;
+  document.getElementById("sortear").innerText = t.sortear;
+}
+
 // =========================
 // LISTAS
 // =========================
 
 let maiores = [
-  "C", "G", "D", "A", "E", "B",
-  "F♯ / G♭", "D♭", "A♭", "E♭", "B♭", "F"
+  "C","G","D","A","E","B",
+  "F♯ / G♭","D♭","A♭","E♭","B♭","F"
 ];
 
 let menores = [
-  "Cm", "Gm", "Dm", "Am", "Em", "Bm",
-  "F♯m", "C♯m", "G♯m", "D♯m", "A♯m", "Fm"
+  "Cm","Gm","Dm","Am","Em","Bm",
+  "F♯m","C♯m","G♯m","D♯m","A♯m","Fm"
 ];
 
 // =========================
@@ -109,7 +205,7 @@ let embaralhadas = [];
 let modoCiclo = "quintas";
 
 // =========================
-// FUNÇÕES
+// LÓGICA
 // =========================
 
 function embaralhar(array) {
@@ -141,7 +237,7 @@ function selecionar(tipo) {
   iniciar();
   atualizarBotoesTipo(tipo);
 
-  document.getElementById("resultado").innerText = "Pronto!";
+  document.getElementById("resultado").innerText = textos[lang].pronto;
   document.getElementById("ciclo").innerText = "";
 }
 
@@ -167,8 +263,8 @@ function gerarCiclo(tonica) {
 
 function sortear() {
   if (embaralhadas.length === 0) {
-    document.getElementById("resultado").innerText = "Fim do ciclo!";
-    document.getElementById("ciclo").innerText = "Clique em Maiores ou Menores.";
+    document.getElementById("resultado").innerText = textos[lang].fim;
+    document.getElementById("ciclo").innerText = textos[lang].instrucao;
     return;
   }
 
@@ -180,13 +276,14 @@ function sortear() {
 }
 
 // =========================
-// INICIALIZAÇÃO
+// INIT
 // =========================
 
 listaAtual = maiores;
 iniciar();
 atualizarBotoesTipo("maior");
 atualizarBotoesModo();
+atualizarTextos();
 
 </script>
 
