@@ -8,25 +8,26 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin: 40px;
+      margin: 20px;
       background-color: #f9f9f9;
       color: #111;
     }
 
     h1 {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      font-size: 28px;
     }
 
     .flags {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .flag {
-      font-size: 24px;
+      font-size: 26px;
       cursor: pointer;
-      margin: 0 5px;
-      padding: 5px;
-      border-radius: 5px;
+      margin: 0 6px;
+      padding: 6px;
+      border-radius: 6px;
     }
 
     .flag.ativo {
@@ -34,14 +35,14 @@
     }
 
     .grupo {
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     button {
       font-size: 18px;
       padding: 12px 18px;
       margin: 6px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 2px solid #444;
       background-color: white;
       color: #111;
@@ -59,25 +60,49 @@
     }
 
     #sortear {
-      margin-top: 20px;
+      margin-top: 15px;
       font-size: 20px;
       padding: 12px 25px;
     }
 
     #resultado {
-      font-size: 42px;
-      margin-top: 30px;
+      font-size: 44px;
+      margin-top: 25px;
       font-weight: bold;
     }
 
+    /* 🔥 PRINCIPAL MELHORIA */
     #ciclo {
       margin-top: 20px;
-      font-size: 20px;
-      line-height: 1.6;
+      font-size: 24px; /* aumentei bem aqui */
+      line-height: 1.8;
       max-width: 900px;
       margin-left: auto;
       margin-right: auto;
+      padding: 0 10px;
+      word-wrap: break-word;
     }
+
+    /* 📱 ajuste para celular */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 22px;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 10px 14px;
+      }
+
+      #resultado {
+        font-size: 36px;
+      }
+
+      #ciclo {
+        font-size: 22px;
+      }
+    }
+
   </style>
 </head>
 
@@ -108,10 +133,6 @@
 <div id="ciclo"></div>
 
 <script>
-
-// =========================
-// IDIOMAS
-// =========================
 
 let lang = "pt";
 
@@ -164,16 +185,13 @@ const textos = {
 
 function setLang(nova) {
   lang = nova;
-
   document.querySelectorAll(".flag").forEach(f => f.classList.remove("ativo"));
   event.target.classList.add("ativo");
-
   atualizarTextos();
 }
 
 function atualizarTextos() {
   let t = textos[lang];
-
   document.getElementById("titulo").innerText = t.titulo;
   document.getElementById("btn-maior").innerText = t.maior;
   document.getElementById("btn-menor").innerText = t.menor;
@@ -181,10 +199,6 @@ function atualizarTextos() {
   document.getElementById("btn-quartas").innerText = t.quartas;
   document.getElementById("sortear").innerText = t.sortear;
 }
-
-// =========================
-// LISTAS
-// =========================
 
 let maiores = [
   "C","G","D","A","E","B",
@@ -196,17 +210,9 @@ let menores = [
   "F♯m","C♯m","G♯m","D♯m","A♯m","Fm"
 ];
 
-// =========================
-// ESTADO
-// =========================
-
 let listaAtual = [];
 let embaralhadas = [];
 let modoCiclo = "quintas";
-
-// =========================
-// LÓGICA
-// =========================
 
 function embaralhar(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -274,10 +280,6 @@ function sortear() {
   let ciclo = gerarCiclo(tonica);
   document.getElementById("ciclo").innerText = ciclo.join(" → ");
 }
-
-// =========================
-// INIT
-// =========================
 
 listaAtual = maiores;
 iniciar();
