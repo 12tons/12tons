@@ -1,109 +1,104 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Sorteador de Tonalidades</title>
+<meta charset="UTF-8">
+<title>Sorteador de Tonalidades</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 20px;
-      background-color: #f9f9f9;
-      color: #111;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 15px;
+  background-color: #f9f9f9;
+  color: #111;
+}
 
-    h1 {
-      margin-bottom: 15px;
-      font-size: 28px;
-    }
+h1 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
 
-    .flags {
-      margin-bottom: 15px;
-    }
+/* flags */
+.flags {
+  margin-bottom: 10px;
+}
+.flag {
+  font-size: 24px;
+  cursor: pointer;
+  margin: 3px;
+  padding: 5px;
+  border-radius: 5px;
+}
+.flag.ativo {
+  background-color: #222;
+}
 
-    .flag {
-      font-size: 26px;
-      cursor: pointer;
-      margin: 0 6px;
-      padding: 6px;
-      border-radius: 6px;
-    }
+/* barra */
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
 
-    .flag.ativo {
-      background-color: #222;
-    }
+button {
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 2px solid #444;
+  background-color: white;
+  cursor: pointer;
+}
 
-    .grupo {
-      margin-bottom: 12px;
-    }
+button:hover {
+  background-color: #eaeaea;
+}
 
-    button {
-      font-size: 18px;
-      padding: 12px 18px;
-      margin: 6px;
-      border-radius: 8px;
-      border: 2px solid #444;
-      background-color: white;
-      color: #111;
-      cursor: pointer;
-    }
+.ativo {
+  background-color: #222;
+  color: white;
+}
 
-    button:hover {
-      background-color: #eaeaea;
-    }
+/* resultado */
+#resultado {
+  font-size: 42px;
+  margin-top: 20px;
+  font-weight: bold;
+}
 
-    .ativo {
-      background-color: #222;
-      color: white;
-      border-color: #000;
-    }
+/* 🔥 LISTA VERTICAL */
+#ciclo {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;              /* controla espaço entre linhas */
+  font-size: 22px;       /* calibrado pra caber 12 linhas */
+  line-height: 1.2;
+}
 
-    #sortear {
-      margin-top: 15px;
-      font-size: 20px;
-      padding: 12px 25px;
-    }
+/* cada item */
+.item {
+  padding: 2px 0;
+}
 
-    #resultado {
-      font-size: 44px;
-      margin-top: 25px;
-      font-weight: bold;
-    }
+/* destaque da tônica */
+.tonica {
+  font-weight: bold;
+  font-size: 26px;
+}
 
-    /* 🔥 PRINCIPAL MELHORIA */
-    #ciclo {
-      margin-top: 20px;
-      font-size: 24px; /* aumentei bem aqui */
-      line-height: 1.8;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 0 10px;
-      word-wrap: break-word;
-    }
-
-    /* 📱 ajuste para celular */
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 22px;
-      }
-
-      button {
-        font-size: 16px;
-        padding: 10px 14px;
-      }
-
-      #resultado {
-        font-size: 36px;
-      }
-
-      #ciclo {
-        font-size: 22px;
-      }
-    }
-
-  </style>
+/* mobile */
+@media (max-width: 600px) {
+  #ciclo {
+    font-size: 20px;
+  }
+  .tonica {
+    font-size: 24px;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -113,179 +108,92 @@
   <span class="flag" onclick="setLang('en')">🇬🇧</span>
   <span class="flag" onclick="setLang('es')">🇪🇸</span>
   <span class="flag" onclick="setLang('fr')">🇫🇷</span>
+  <span class="flag" onclick="setLang('de')">🇩🇪</span>
+  <span class="flag" onclick="setLang('it')">🇮🇹</span>
 </div>
 
 <h1 id="titulo">Sorteador de Tonalidades</h1>
 
-<div class="grupo">
+<div class="barra">
   <button id="btn-maior" onclick="selecionar('maior')">Maiores</button>
   <button id="btn-menor" onclick="selecionar('menor')">Menores</button>
-</div>
 
-<div class="grupo">
   <button id="btn-quintas" onclick="setModo('quintas')">Quintas</button>
   <button id="btn-quartas" onclick="setModo('quartas')">Quartas</button>
-</div>
 
-<button id="sortear" onclick="sortear()">Sortear</button>
+  <button onclick="setModo('cromaticoAsc')">Crom ↑</button>
+  <button onclick="setModo('cromaticoDesc')">Crom ↓</button>
+
+  <button id="sortear" onclick="sortear()">Sortear</button>
+</div>
 
 <div id="resultado">—</div>
 <div id="ciclo"></div>
 
 <script>
 
-let lang = "pt";
+// idiomas (simplificado)
+let lang="pt";
 
-const textos = {
-  pt: {
-    titulo: "Sorteador de Tonalidades",
-    maior: "Maiores",
-    menor: "Menores",
-    quintas: "Quintas",
-    quartas: "Quartas",
-    sortear: "Sortear",
-    pronto: "Pronto!",
-    fim: "Fim do ciclo!",
-    instrucao: "Clique em Maiores ou Menores."
-  },
-  en: {
-    titulo: "Key Randomizer",
-    maior: "Major",
-    menor: "Minor",
-    quintas: "Fifths",
-    quartas: "Fourths",
-    sortear: "Draw",
-    pronto: "Ready!",
-    fim: "End of cycle!",
-    instrucao: "Click Major or Minor."
-  },
-  es: {
-    titulo: "Generador de Tonalidades",
-    maior: "Mayores",
-    menor: "Menores",
-    quintas: "Quintas",
-    quartas: "Cuartas",
-    sortear: "Sortear",
-    pronto: "¡Listo!",
-    fim: "Fin del ciclo",
-    instrucao: "Haz clic en Mayores o Menores."
-  },
-  fr: {
-    titulo: "Générateur de tonalités",
-    maior: "Majeures",
-    menor: "Mineures",
-    quintas: "Quintes",
-    quartas: "Quartes",
-    sortear: "Tirer",
-    pronto: "Prêt !",
-    fim: "Fin du cycle",
-    instrucao: "Cliquez sur Majeures ou Mineures."
-  }
-};
+// listas
+let maiores=["C","G","D","A","E","B","F♯ / G♭","D♭","A♭","E♭","B♭","F"];
+let menores=["Cm","Gm","Dm","Am","Em","Bm","F♯m","C♯m","G♯m","D♯m","A♯m","Fm"];
+let cromatico=["C","C♯ / D♭","D","D♯ / E♭","E","F","F♯ / G♭","G","G♯ / A♭","A","A♯ / B♭","B"];
 
-function setLang(nova) {
-  lang = nova;
-  document.querySelectorAll(".flag").forEach(f => f.classList.remove("ativo"));
-  event.target.classList.add("ativo");
-  atualizarTextos();
-}
+let listaAtual=[];
+let embaralhadas=[];
+let modo="quintas";
 
-function atualizarTextos() {
-  let t = textos[lang];
-  document.getElementById("titulo").innerText = t.titulo;
-  document.getElementById("btn-maior").innerText = t.maior;
-  document.getElementById("btn-menor").innerText = t.menor;
-  document.getElementById("btn-quintas").innerText = t.quintas;
-  document.getElementById("btn-quartas").innerText = t.quartas;
-  document.getElementById("sortear").innerText = t.sortear;
-}
+function embaralhar(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
+function iniciar(){embaralhadas=[...listaAtual];embaralhar(embaralhadas);}
+function selecionar(t){listaAtual=(t==="maior")?maiores:menores;iniciar();}
+function setModo(m){modo=m;}
 
-let maiores = [
-  "C","G","D","A","E","B",
-  "F♯ / G♭","D♭","A♭","E♭","B♭","F"
-];
+function gerarCiclo(t){
+  let base=(modo.includes("cromatico"))?cromatico:listaAtual;
+  let index=base.indexOf(t.replace("m",""));
+  let ciclo=[];
 
-let menores = [
-  "Cm","Gm","Dm","Am","Em","Bm",
-  "F♯m","C♯m","G♯m","D♯m","A♯m","Fm"
-];
+  for(let i=0;i<base.length;i++){
+    let pos;
+    if(modo==="quintas") pos=(index+i)%base.length;
+    else if(modo==="quartas") pos=(index-i+base.length)%base.length;
+    else if(modo==="cromaticoAsc") pos=(index+i)%base.length;
+    else pos=(index-i+base.length)%base.length;
 
-let listaAtual = [];
-let embaralhadas = [];
-let modoCiclo = "quintas";
-
-function embaralhar(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-function iniciar() {
-  embaralhadas = [...listaAtual];
-  embaralhar(embaralhadas);
-}
-
-function atualizarBotoesTipo(tipo) {
-  document.getElementById("btn-maior").classList.remove("ativo");
-  document.getElementById("btn-menor").classList.remove("ativo");
-  document.getElementById("btn-" + tipo).classList.add("ativo");
-}
-
-function atualizarBotoesModo() {
-  document.getElementById("btn-quintas").classList.remove("ativo");
-  document.getElementById("btn-quartas").classList.remove("ativo");
-  document.getElementById("btn-" + modoCiclo).classList.add("ativo");
-}
-
-function selecionar(tipo) {
-  listaAtual = (tipo === 'maior') ? maiores : menores;
-  iniciar();
-  atualizarBotoesTipo(tipo);
-
-  document.getElementById("resultado").innerText = textos[lang].pronto;
-  document.getElementById("ciclo").innerText = "";
-}
-
-function setModo(modo) {
-  modoCiclo = modo;
-  atualizarBotoesModo();
-}
-
-function gerarCiclo(tonica) {
-  let index = listaAtual.indexOf(tonica);
-  let ciclo = [];
-
-  for (let i = 0; i < listaAtual.length; i++) {
-    let pos = (modoCiclo === "quintas")
-      ? (index + i) % listaAtual.length
-      : (index - i + listaAtual.length) % listaAtual.length;
-
-    ciclo.push(listaAtual[pos]);
+    let nota=base[pos];
+    if(listaAtual===menores && !modo.includes("cromatico")) nota+="m";
+    ciclo.push(nota);
   }
 
   return ciclo;
 }
 
-function sortear() {
-  if (embaralhadas.length === 0) {
-    document.getElementById("resultado").innerText = textos[lang].fim;
-    document.getElementById("ciclo").innerText = textos[lang].instrucao;
+function sortear(){
+  if(embaralhadas.length===0){
+    document.getElementById("resultado").innerText="Fim";
     return;
   }
 
-  let tonica = embaralhadas.pop();
-  document.getElementById("resultado").innerText = tonica;
+  let t=embaralhadas.pop();
+  document.getElementById("resultado").innerText=t;
 
-  let ciclo = gerarCiclo(tonica);
-  document.getElementById("ciclo").innerText = ciclo.join(" → ");
+  let ciclo=gerarCiclo(t);
+
+  let html="";
+  ciclo.forEach((n,i)=>{
+    if(i===0){
+      html+=`<div class="item tonica">${n}</div>`;
+    } else {
+      html+=`<div class="item">${n}</div>`;
+    }
+  });
+
+  document.getElementById("ciclo").innerHTML=html;
 }
 
-listaAtual = maiores;
+listaAtual=maiores;
 iniciar();
-atualizarBotoesTipo("maior");
-atualizarBotoesModo();
-atualizarTextos();
 
 </script>
 
