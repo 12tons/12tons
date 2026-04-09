@@ -118,10 +118,11 @@ let embaralhadas = [];
 let modo = "quintas";
 let menorModo = "natural";
 
+const letras = ["C","D","E","F","G","A","B"];
+const semitons = {C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+
 function limparAtivos(ids){
-  ids.forEach(function(id){
-    document.getElementById(id).classList.remove("ativo");
-  });
+  ids.forEach(id=>document.getElementById(id).classList.remove("ativo"));
 }
 
 function setAcorde(tipo){
@@ -133,13 +134,13 @@ function setAcorde(tipo){
 function selecionar(tipo){
   limparAtivos(["btn-maior","btn-menor"]);
 
-  if(tipo === "maior"){
+  if(tipo==="maior"){
     listaAtual = ciclo.slice();
-    document.getElementById("submenuMenor").style.display = "none";
+    document.getElementById("submenuMenor").style.display="none";
     document.getElementById("btn-maior").classList.add("ativo");
   } else {
-    listaAtual = ciclo.map(function(n){ return n + "m"; });
-    document.getElementById("submenuMenor").style.display = "block";
+    listaAtual = ciclo.map(n=>n+"m");
+    document.getElementById("submenuMenor").style.display="block";
     document.getElementById("btn-menor").classList.add("ativo");
   }
 
@@ -149,15 +150,13 @@ function selecionar(tipo){
 function setModo(m){
   modo = m;
   limparAtivos(["btn-quintas","btn-quartas","btn-cromA","btn-cromD"]);
-
-  var id = {
-    "quintas":"btn-quintas",
-    "quartas":"btn-quartas",
-    "cromaticoAsc":"btn-cromA",
-    "cromaticoDesc":"btn-cromD"
-  }[m];
-
-  document.getElementById(id).classList.add("ativo");
+  const map = {
+    quintas:"btn-quintas",
+    quartas:"btn-quartas",
+    cromaticoAsc:"btn-cromA",
+    cromaticoDesc:"btn-cromD"
+  };
+  document.getElementById(map[m]).classList.add("ativo");
 }
 
 function setMenorModo(m){
@@ -166,12 +165,10 @@ function setMenorModo(m){
   document.getElementById("btn-"+m).classList.add("ativo");
 }
 
-function embaralhar(arr){
-  for(let i = arr.length - 1; i > 0; i--){
-    let j = Math.floor(Math.random() * (i + 1));
-    let temp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = temp;
+function embaralhar(a){
+  for(let i=a.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
   }
 }
 
@@ -182,74 +179,146 @@ function iniciar(){
 
 function resetar(){
   iniciar();
-  document.getElementById("resultado").innerText = "—";
-  document.getElementById("ciclo").innerHTML = "";
+  document.getElementById("resultado").innerText="—";
+  document.getElementById("ciclo").innerHTML="";
 }
 
-function gerarCiclo(t){
-  let resultado = [];
+/* =========================
+   GERA ESCALA CORRETA
+========================= */
 
-  if(modo === "cromaticoAsc" || modo === "cromaticoDesc"){
-    const crom = ["C","C#","D","D#","E","F","F#","G","G#","A","Bb","B"];
-    let base = t.replace("m","");
-    let idx = crom.indexOf(base);
+function nota(letra, alvo){
+  let base = semitons[letra];
+  let diff = (alvo - base + 12) % 12;
 
-    for(let i=0;i<12;i++){
-      let pos = modo === "cromaticoAsc"
-        ? (idx + i) % 12
-        : (idx - i + 12) % 12;
+  if(diff===0) return letra;
+  if(diff===1) return letra+"#";
+  if(diff===11) return letra+"b";
 
-      let nota = crom[pos];
-      if(t.includes("m")) nota += "m";
-      resultado.push(nota);
-    }
-
-    return resultado;
-  }
-
-  let index = listaAtual.indexOf(t);
-
-  for(let i=0;i<12;i++){
-    let pos = modo === "quartas"
-      ? (index - i + 12) % 12
-      : (index + i) % 12;
-
-    resultado.push(listaAtual[pos]);
-  }
-
-  return resultado;
+  return letra;
 }
+
+function escala(tonica, intervalos){
+  let base = tonica.replace("m","");
+  let l = base[0];
+  let idx = letras.indexOf(l);
+
+  let baseSemi = semitons[l];
+  if(base.includes("#")) baseSemi++;
+  if(base.includes("b")) baseSemi--;
+
+  let esc = [];
+
+  for(let i=0;i<7;i++){
+    let letra = letras[(idx+i)%7];
+    let alvo = (baseSemi + intervalos[i]) % 12;
+    esc.push(nota(letra, alvo));
+  }
+
+  return esc;
+}
+
+/* =========================
+   CAMPO HARMÔNICO
+========================= */
 
 function campo(t){
-  if(tipoAcorde === "triade"){
-    return ["I","ii","iii","IV","V","vi","vii°"];
-  } else {
-    return ["I7M","ii7","iii7","IV7M","V7","vi7","viiø"];
+
+  const maior=[0,2,4,5,7,9,11];
+  const menorNat=[0,2,3,5,7,8,10];
+  const menorHar=[0,2,3,5,7,8,11];
+
+  if(!t.includes("m")){
+    let e=escala(t,maior);
+
+    if(tipoAcorde==="triade"){
+      return [e[0],e[1]+"m",e[2]+"m",e[3],e[4],e[5]+"m",e[6]+"°"];
+    }
+
+    return [e[0]+"7M",e[1]+"m7",e[2]+"m7",e[3]+"7M",e[4]+"7",e[5]+"m7",e[6]+"ø"];
   }
+
+  if(menorModo==="natural"){
+    let e=escala(t,menorNat);
+
+    if(tipoAcorde==="triade"){
+      return [e[0]+"m",e[1]+"°",e[2],e[3]+"m",e[4]+"m",e[5],e[6]];
+    }
+
+    return [e[0]+"m7",e[1]+"ø",e[2]+"7M",e[3]+"m7",e[4]+"m7",e[5]+"7M",e[6]+"7"];
+  }
+
+  let e=escala(t,menorHar);
+
+  if(tipoAcorde==="triade"){
+    return [e[0]+"m",e[1]+"°",e[2]+"(#5)",e[3]+"m",e[4],e[5],e[6]+"°"];
+  }
+
+  return [e[0]+"m(7M)",e[1]+"ø",e[2]+"7M(#5)",e[3]+"m7",e[4]+"7",e[5]+"7M",e[6]+"°"];
 }
+
+/* =========================
+   CICLOS
+========================= */
+
+function gerarCiclo(t){
+
+  let out=[];
+
+  if(modo==="cromaticoAsc" || modo==="cromaticoDesc"){
+    const crom=["C","C#","D","D#","E","F","F#","G","G#","A","Bb","B"];
+    let base=t.replace("m","");
+    let idx=crom.indexOf(base);
+
+    for(let i=0;i<12;i++){
+      let pos = modo==="cromaticoAsc"
+        ? (idx+i)%12
+        : (idx-i+12)%12;
+
+      let n=crom[pos];
+      if(t.includes("m")) n+="m";
+      out.push(n);
+    }
+
+    return out;
+  }
+
+  let index=listaAtual.indexOf(t);
+
+  for(let i=0;i<12;i++){
+    let pos = modo==="quartas"
+      ? (index-i+12)%12
+      : (index+i)%12;
+
+    out.push(listaAtual[pos]);
+  }
+
+  return out;
+}
+
+/* =========================
+   SORTEIO
+========================= */
 
 function sortear(){
 
-  if(embaralhadas.length === 0){
+  if(embaralhadas.length===0){
     iniciar();
   }
 
-  let t = embaralhadas.pop();
-  document.getElementById("resultado").innerText = t;
+  let t=embaralhadas.pop();
+  document.getElementById("resultado").innerText=t;
 
-  let cicloGerado = gerarCiclo(t);
+  let cicloGerado=gerarCiclo(t);
 
-  let html = "";
+  let html="";
 
   cicloGerado.forEach(function(ton){
-    let acordes = campo(ton).map(function(a){
-      return "<div class='acorde'>" + a + "</div>";
-    }).join("");
-
-    html += "<div class='linha'><div class='tonica'>" + ton + "</div>" + acordes + "</div>";
+    let acordes=campo(ton).map(a=>"<div class='acorde'>"+a+"</div>").join("");
+    html+="<div class='linha'><div class='tonica'>"+ton+"</div>"+acordes+"</div>";
   });
 
-  document.getElementById("ciclo").innerHTML = html;
+  document.getElementById("ciclo").innerHTML=html;
 }
 
 setAcorde("triade");
