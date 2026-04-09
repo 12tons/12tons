@@ -100,6 +100,7 @@ button:hover { background: #eaeaea; }
   <button id="btn-quartas" onclick="setModo('quartas')">Quartas</button>
   <button id="btn-cromA" onclick="setModo('cromaticoAsc')">Crom ↑</button>
   <button id="btn-cromD" onclick="setModo('cromaticoDesc')">Crom ↓</button>
+  <button id="btn-random" onclick="setModo('random')">Randômico</button>
 </div>
 
 <button id="sortear" onclick="sortear()">Sortear</button><br>
@@ -149,13 +150,16 @@ function selecionar(tipo){
 
 function setModo(m){
   modo = m;
-  limparAtivos(["btn-quintas","btn-quartas","btn-cromA","btn-cromD"]);
+  limparAtivos(["btn-quintas","btn-quartas","btn-cromA","btn-cromD","btn-random"]);
+
   const map = {
     quintas:"btn-quintas",
     quartas:"btn-quartas",
     cromaticoAsc:"btn-cromA",
-    cromaticoDesc:"btn-cromD"
+    cromaticoDesc:"btn-cromD",
+    random:"btn-random"
   };
+
   document.getElementById(map[m]).classList.add("ativo");
 }
 
@@ -170,6 +174,7 @@ function embaralhar(a){
     let j=Math.floor(Math.random()*(i+1));
     [a[i],a[j]]=[a[j],a[i]];
   }
+  return a;
 }
 
 function iniciar(){
@@ -184,7 +189,7 @@ function resetar(){
 }
 
 /* =========================
-   GERA ESCALA CORRETA
+   ESCALA E CAMPO
 ========================= */
 
 function nota(letra, alvo){
@@ -217,10 +222,6 @@ function escala(tonica, intervalos){
 
   return esc;
 }
-
-/* =========================
-   CAMPO HARMÔNICO
-========================= */
 
 function campo(t){
 
@@ -262,6 +263,10 @@ function campo(t){
 ========================= */
 
 function gerarCiclo(t){
+
+  if(modo==="random"){
+    return embaralhar(listaAtual.slice());
+  }
 
   let out=[];
 
