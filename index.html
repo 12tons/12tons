@@ -31,29 +31,29 @@ button:hover { background: #eaeaea; }
 
 #sortear {
   margin-top: 10px;
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   background: #d62828;
   color: #ffd60a;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 #zerar {
-  margin-top: 10px;
+  margin-top: 8px;
   background: #444;
   color: white;
 }
 
 #resultado {
-  font-size: 34px;
+  font-size: 32px;
   margin-top: 10px;
 }
 
 #ciclo {
   margin-top: 15px;
-  font-size: 28px;
+  font-size: 26px;
   max-width: 1000px;
   margin-inline: auto;
 }
@@ -61,9 +61,8 @@ button:hover { background: #eaeaea; }
 .linha {
   display: grid;
   grid-template-columns: 80px repeat(7, 1fr);
-  align-items: center;
+  gap: 8px;
   margin-bottom: 10px;
-  gap: 10px;
 }
 
 .tonica {
@@ -103,8 +102,7 @@ button:hover { background: #eaeaea; }
   <button id="btn-cromD" onclick="setModo('cromaticoDesc')">Crom ↓</button>
 </div>
 
-<button id="sortear" onclick="sortear()">Sortear</button>
-<br>
+<button id="sortear" onclick="sortear()">Sortear</button><br>
 <button id="zerar" onclick="resetar()">Zerar</button>
 
 <div id="resultado">—</div>
@@ -112,40 +110,36 @@ button:hover { background: #eaeaea; }
 
 <script>
 
-const letras=["C","D","E","F","G","A","B"];
-const semitons={"C":0,"D":2,"E":4,"F":5,"G":7,"A":9,"B":11};
+const ciclo = ["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
 
-let tipoAcorde="triade";
-let listaAtual=[],embaralhadas=[],modo="quintas",menorModo="natural";
-
-const ciclo=["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
-
-function resetar(){
-  iniciar();
-  document.getElementById("resultado").innerText="—";
-  document.getElementById("ciclo").innerHTML="";
-}
+let tipoAcorde = "triade";
+let listaAtual = [];
+let embaralhadas = [];
+let modo = "quintas";
+let menorModo = "natural";
 
 function limparAtivos(ids){
-  ids.forEach(id=>document.getElementById(id).classList.remove("ativo"));
+  ids.forEach(function(id){
+    document.getElementById(id).classList.remove("ativo");
+  });
 }
 
 function setAcorde(tipo){
+  tipoAcorde = tipo;
   limparAtivos(["btn-triade","btn-tetrade"]);
-  tipoAcorde=tipo;
   document.getElementById("btn-"+tipo).classList.add("ativo");
 }
 
 function selecionar(tipo){
   limparAtivos(["btn-maior","btn-menor"]);
 
-  if(tipo==="maior"){
-    listaAtual=ciclo;
-    document.getElementById("submenuMenor").style.display="none";
+  if(tipo === "maior"){
+    listaAtual = ciclo.slice();
+    document.getElementById("submenuMenor").style.display = "none";
     document.getElementById("btn-maior").classList.add("ativo");
   } else {
-    listaAtual=ciclo.map(n=>n+"m");
-    document.getElementById("submenuMenor").style.display="block";
+    listaAtual = ciclo.map(function(n){ return n + "m"; });
+    document.getElementById("submenuMenor").style.display = "block";
     document.getElementById("btn-menor").classList.add("ativo");
   }
 
@@ -153,68 +147,116 @@ function selecionar(tipo){
 }
 
 function setModo(m){
+  modo = m;
   limparAtivos(["btn-quintas","btn-quartas","btn-cromA","btn-cromD"]);
-  modo=m;
-  document.getElementById(
-    m==="quintas"?"btn-quintas":
-    m==="quartas"?"btn-quartas":
-    m==="cromaticoAsc"?"btn-cromA":"btn-cromD"
-  ).classList.add("ativo");
+
+  var id = {
+    "quintas":"btn-quintas",
+    "quartas":"btn-quartas",
+    "cromaticoAsc":"btn-cromA",
+    "cromaticoDesc":"btn-cromD"
+  }[m];
+
+  document.getElementById(id).classList.add("ativo");
 }
 
 function setMenorModo(m){
+  menorModo = m;
   limparAtivos(["btn-natural","btn-harmonica"]);
-  menorModo=m;
   document.getElementById("btn-"+m).classList.add("ativo");
 }
 
+function embaralhar(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+}
+
 function iniciar(){
-  embaralhadas=[...listaAtual];
+  embaralhadas = listaAtual.slice();
   embaralhar(embaralhadas);
 }
 
-function embaralhar(a){
-  for(let i=a.length-1;i>0;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
+function resetar(){
+  iniciar();
+  document.getElementById("resultado").innerText = "—";
+  document.getElementById("ciclo").innerHTML = "";
+}
+
+function gerarCiclo(t){
+  let resultado = [];
+
+  if(modo === "cromaticoAsc" || modo === "cromaticoDesc"){
+    const crom = ["C","C#","D","D#","E","F","F#","G","G#","A","Bb","B"];
+    let base = t.replace("m","");
+    let idx = crom.indexOf(base);
+
+    for(let i=0;i<12;i++){
+      let pos = modo === "cromaticoAsc"
+        ? (idx + i) % 12
+        : (idx - i + 12) % 12;
+
+      let nota = crom[pos];
+      if(t.includes("m")) nota += "m";
+      resultado.push(nota);
+    }
+
+    return resultado;
+  }
+
+  let index = listaAtual.indexOf(t);
+
+  for(let i=0;i<12;i++){
+    let pos = modo === "quartas"
+      ? (index - i + 12) % 12
+      : (index + i) % 12;
+
+    resultado.push(listaAtual[pos]);
+  }
+
+  return resultado;
+}
+
+function campo(t){
+  if(tipoAcorde === "triade"){
+    return ["I","ii","iii","IV","V","vi","vii°"];
+  } else {
+    return ["I7M","ii7","iii7","IV7M","V7","vi7","viiø"];
   }
 }
 
-function nota(letra, alvo){
-  let base=semitons[letra];
-  let diff=(alvo-base+12)%12;
+function sortear(){
 
-  if(diff===0) return letra;
-  if(diff===1) return letra+"#";
-  if(diff===11) return letra+"b";
-  return letra;
-}
-
-function escala(tonica,intervalos){
-  let base=tonica.replace("m","");
-  let l=base[0];
-  let idxL=letras.indexOf(l);
-
-  let baseSemi=semitons[l];
-  if(base.includes("#")) baseSemi++;
-  if(base.includes("b")) baseSemi--;
-
-  let esc=[];
-
-  for(let i=0;i<7;i++){
-    let letra=letras[(idxL+i)%7];
-    let alvo=(baseSemi+intervalos[i])%12;
-    esc.push(nota(letra,alvo));
+  if(embaralhadas.length === 0){
+    iniciar();
   }
 
-  return esc;
+  let t = embaralhadas.pop();
+  document.getElementById("resultado").innerText = t;
+
+  let cicloGerado = gerarCiclo(t);
+
+  let html = "";
+
+  cicloGerado.forEach(function(ton){
+    let acordes = campo(ton).map(function(a){
+      return "<div class='acorde'>" + a + "</div>";
+    }).join("");
+
+    html += "<div class='linha'><div class='tonica'>" + ton + "</div>" + acordes + "</div>";
+  });
+
+  document.getElementById("ciclo").innerHTML = html;
 }
 
-function campo(tonica){
+setAcorde("triade");
+selecionar("maior");
+setModo("quintas");
 
-  let maior=[0,2,4,5,7,9,11];
-  let menorNat=[0,2,3,5,7,8,10];
-  let menorHar=[0,2,3,5,7,8,11];
+</script>
 
-  if(!tonica.includes("m")){
-    let e=
+</body>
+</html>
