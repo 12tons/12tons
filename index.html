@@ -63,6 +63,16 @@ button:hover { background: #eaeaea; }
   grid-template-columns: 80px repeat(7, 1fr);
   gap: 8px;
   margin-bottom: 10px;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.linha:nth-child(even) {
+  background-color: #e8f2ff;
+}
+
+.linha:nth-child(odd) {
+  background-color: #ffffff;
 }
 
 .tonica {
@@ -188,9 +198,7 @@ function resetar(){
   document.getElementById("ciclo").innerHTML="";
 }
 
-/* =========================
-   ESCALA E CAMPO
-========================= */
+/* ===== ESCALA ===== */
 
 function nota(letra, alvo){
   let base = semitons[letra];
@@ -222,6 +230,8 @@ function escala(tonica, intervalos){
 
   return esc;
 }
+
+/* ===== CAMPO ===== */
 
 function campo(t){
 
@@ -258,9 +268,7 @@ function campo(t){
   return [e[0]+"m(7M)",e[1]+"ø",e[2]+"7M(#5)",e[3]+"m7",e[4]+"7",e[5]+"7M",e[6]+"°"];
 }
 
-/* =========================
-   CICLOS
-========================= */
+/* ===== CICLOS ===== */
 
 function gerarCiclo(t){
 
@@ -301,9 +309,7 @@ function gerarCiclo(t){
   return out;
 }
 
-/* =========================
-   SORTEIO
-========================= */
+/* ===== SORTEIO ===== */
 
 function sortear(){
 
