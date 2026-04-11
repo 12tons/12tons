@@ -68,34 +68,31 @@ button:hover { background: #eceff1; }
   margin-inline: auto;
 }
 
-/* LINHAS */
+/* LINHA */
 .linha {
   display: grid;
-  grid-template-columns: 90px repeat(7, 1fr);
+  grid-template-columns: 110px repeat(7, 1fr);
   gap: 12px;
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 6px;
 }
 
-/* zebra mais suave */
-.linha:nth-child(even) {
-  background-color: #edf2f7;
-}
+/* zebra suave */
+.linha:nth-child(even) { background-color: #edf2f7; }
+.linha:nth-child(odd) { background-color: #ffffff; }
 
-.linha:nth-child(odd) {
-  background-color: #ffffff;
-}
-
-/* tônica */
+/* TÔNICA (DESTAQUE PRINCIPAL) */
 .tonica {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 22px;
   text-align: left;
-  font-size: 18px;
-  opacity: 0.85;
+  padding-right: 10px;
+  border-right: 2px solid #d0d7de;
+  color: #111;
 }
 
-/* cifras */
+/* ACORDES */
 .acorde {
   text-align: center;
   font-size: 22px;
@@ -142,7 +139,7 @@ button:hover { background: #eceff1; }
 
 <script>
 
-/* ===== MESMO JS QUE JÁ FUNCIONAVA — SEM MUDANÇAS NA LÓGICA ===== */
+/* ===== MESMO JS (sem alteração funcional) ===== */
 
 const ciclo = ["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
 
@@ -221,7 +218,7 @@ function resetar(){
   document.getElementById("ciclo").innerHTML="";
 }
 
-/* ===== ESCALA ===== */
+/* ===== ESCALA E CAMPO (inalterado) ===== */
 
 function nota(letra, alvo){
   let base=semitons[letra];
@@ -253,8 +250,6 @@ function escala(tonica,intervalos){
 
   return esc;
 }
-
-/* ===== CAMPO ===== */
 
 function campo(t){
 
@@ -292,8 +287,6 @@ function campo(t){
   }
 }
 
-/* ===== CICLOS ===== */
-
 function gerarCiclo(t){
 
   if(modo==="random"){
@@ -326,8 +319,6 @@ function gerarCiclo(t){
 
   return out;
 }
-
-/* ===== SORTEIO ===== */
 
 function sortear(){
 
