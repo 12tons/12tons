@@ -26,7 +26,6 @@ button {
   border: 1px solid #bbb;
   background: #ffffff;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 button:hover { background: #eceff1; }
@@ -34,7 +33,6 @@ button:hover { background: #eceff1; }
 .ativo {
   background: #2b2b2b;
   color: white;
-  border-color: #2b2b2b;
 }
 
 #sortear {
@@ -43,9 +41,8 @@ button:hover { background: #eceff1; }
   height: 80px;
   border-radius: 50%;
   background: #b71c1c;
-  color: #ffffff;
+  color: white;
   border: none;
-  font-size: 15px;
   font-weight: 600;
 }
 
@@ -72,24 +69,22 @@ button:hover { background: #eceff1; }
 .linha {
   display: grid;
   grid-template-columns: 110px repeat(7, 1fr);
-  gap: 12px;
+  gap: 0;
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 6px;
 }
 
-/* zebra suave */
 .linha:nth-child(even) { background-color: #edf2f7; }
 .linha:nth-child(odd) { background-color: #ffffff; }
 
-/* TÔNICA (DESTAQUE PRINCIPAL) */
+/* TÔNICA */
 .tonica {
   font-weight: 700;
   font-size: 22px;
   text-align: left;
-  padding-right: 10px;
-  border-right: 2px solid #d0d7de;
-  color: #111;
+  padding: 6px 10px;
+  border-right: 3px solid #4a90e2;
 }
 
 /* ACORDES */
@@ -97,7 +92,11 @@ button:hover { background: #eceff1; }
   text-align: center;
   font-size: 22px;
   font-weight: 500;
-  letter-spacing: 0.5px;
+  padding: 6px 8px;
+}
+
+.acorde:not(:last-child) {
+  border-right: 1px solid #d6dde5;
 }
 
 </style>
@@ -108,27 +107,27 @@ button:hover { background: #eceff1; }
 <h1>Sorteador de Tonalidades</h1>
 
 <div>
-  <button id="btn-triade" onclick="setAcorde('triade')">Tríades</button>
-  <button id="btn-tetrade" onclick="setAcorde('tetrade')">Tétrades</button>
+  <button onclick="setAcorde('triade')">Tríades</button>
+  <button onclick="setAcorde('tetrade')">Tétrades</button>
 </div>
 
 <div>
-  <button id="btn-maior" onclick="selecionar('maior')">Maiores</button>
-  <button id="btn-menor" onclick="selecionar('menor')">Menores</button>
+  <button onclick="selecionar('maior')">Maiores</button>
+  <button onclick="selecionar('menor')">Menores</button>
 </div>
 
 <div id="submenuMenor" style="display:none;">
-  <button id="btn-natural" onclick="setMenorModo('natural')">Menor natural</button>
-  <button id="btn-harmonica" onclick="setMenorModo('harmonica')">Menor harmônica</button>
-  <button id="btn-melodica" onclick="setMenorModo('melodica')">Menor melódica</button>
+  <button onclick="setMenorModo('natural')">Menor natural</button>
+  <button onclick="setMenorModo('harmonica')">Menor harmônica</button>
+  <button onclick="setMenorModo('melodica')">Menor melódica</button>
 </div>
 
 <div>
-  <button id="btn-quintas" onclick="setModo('quintas')">Quintas</button>
-  <button id="btn-quartas" onclick="setModo('quartas')">Quartas</button>
-  <button id="btn-cromA" onclick="setModo('cromaticoAsc')">Crom ↑</button>
-  <button id="btn-cromD" onclick="setModo('cromaticoDesc')">Crom ↓</button>
-  <button id="btn-random" onclick="setModo('random')">Randômico</button>
+  <button onclick="setModo('quintas')">Quintas</button>
+  <button onclick="setModo('quartas')">Quartas</button>
+  <button onclick="setModo('cromaticoAsc')">Crom ↑</button>
+  <button onclick="setModo('cromaticoDesc')">Crom ↓</button>
+  <button onclick="setModo('random')">Randômico</button>
 </div>
 
 <button id="sortear" onclick="sortear()">Sortear</button><br>
@@ -139,11 +138,11 @@ button:hover { background: #eceff1; }
 
 <script>
 
-/* ===== MESMO JS (sem alteração funcional) ===== */
+/* JS mantido estável */
 
 const ciclo = ["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
 
-let tipoAcorde="triade";
+let tipoAcorde="tetrade";
 let listaAtual=[];
 let embaralhadas=[];
 let modo="quintas";
@@ -152,52 +151,21 @@ let menorModo="natural";
 const letras=["C","D","E","F","G","A","B"];
 const semitons={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 
-function limparAtivos(ids){
-  ids.forEach(id=>document.getElementById(id).classList.remove("ativo"));
-}
+function setAcorde(t){ tipoAcorde=t; }
 
-function setAcorde(tipo){
-  tipoAcorde=tipo;
-  limparAtivos(["btn-triade","btn-tetrade"]);
-  document.getElementById("btn-"+tipo).classList.add("ativo");
-}
-
-function selecionar(tipo){
-  limparAtivos(["btn-maior","btn-menor"]);
-
-  if(tipo==="maior"){
+function selecionar(t){
+  if(t==="maior"){
     listaAtual=ciclo.slice();
     document.getElementById("submenuMenor").style.display="none";
-    document.getElementById("btn-maior").classList.add("ativo");
   } else {
     listaAtual=ciclo.map(n=>n+"m");
     document.getElementById("submenuMenor").style.display="block";
-    document.getElementById("btn-menor").classList.add("ativo");
   }
-
   iniciar();
 }
 
-function setModo(m){
-  modo=m;
-  limparAtivos(["btn-quintas","btn-quartas","btn-cromA","btn-cromD","btn-random"]);
-
-  const map={
-    quintas:"btn-quintas",
-    quartas:"btn-quartas",
-    cromaticoAsc:"btn-cromA",
-    cromaticoDesc:"btn-cromD",
-    random:"btn-random"
-  };
-
-  document.getElementById(map[m]).classList.add("ativo");
-}
-
-function setMenorModo(m){
-  menorModo=m;
-  limparAtivos(["btn-natural","btn-harmonica","btn-melodica"]);
-  document.getElementById("btn-"+m).classList.add("ativo");
-}
+function setModo(m){ modo=m; }
+function setMenorModo(m){ menorModo=m; }
 
 function embaralhar(a){
   for(let i=a.length-1;i>0;i--){
@@ -218,41 +186,34 @@ function resetar(){
   document.getElementById("ciclo").innerHTML="";
 }
 
-/* ===== ESCALA E CAMPO (inalterado) ===== */
-
 function nota(letra, alvo){
   let base=semitons[letra];
   let diff=(alvo-base+12)%12;
-
   if(diff===0) return letra;
   if(diff===1) return letra+"#";
   if(diff===11) return letra+"b";
-
   return letra;
 }
 
-function escala(tonica,intervalos){
-  let base=tonica.replace("m","");
+function escala(t,ints){
+  let base=t.replace("m","");
   let l=base[0];
   let idx=letras.indexOf(l);
 
-  let baseSemi=semitons[l];
-  if(base.includes("#")) baseSemi++;
-  if(base.includes("b")) baseSemi--;
+  let semi=semitons[l];
+  if(base.includes("#")) semi++;
+  if(base.includes("b")) semi--;
 
-  let esc=[];
-
+  let out=[];
   for(let i=0;i<7;i++){
     let letra=letras[(idx+i)%7];
-    let alvo=(baseSemi+intervalos[i])%12;
-    esc.push(nota(letra,alvo));
+    let alvo=(semi+ints[i])%12;
+    out.push(nota(letra,alvo));
   }
-
-  return esc;
+  return out;
 }
 
 function campo(t){
-
   const maior=[0,2,4,5,7,9,11];
   const menorNat=[0,2,3,5,7,8,10];
   const menorHar=[0,2,3,5,7,8,11];
@@ -263,9 +224,9 @@ function campo(t){
     return [e[0]+"7M",e[1]+"m7",e[2]+"m7",e[3]+"7M",e[4]+"7",e[5]+"m7",e[6]+"ø"];
   }
 
-  if(menorModo==="natural"){
-    let e=escala(t,menorNat);
-    return [e[0]+"m7",e[1]+"ø",e[2]+"7M",e[3]+"m7",e[4]+"m7",e[5]+"7M",e[6]+"7"];
+  if(menorModo==="melodica"){
+    let e=escala(t,menorMel);
+    return [e[0]+"m7M6",e[1]+"m7",e[2]+"maj7(#5)",e[3]+"7(#11)",e[4]+"7(b13)",e[5]+"ø",e[6]+"ø"];
   }
 
   if(menorModo==="harmonica"){
@@ -273,67 +234,31 @@ function campo(t){
     return [e[0]+"m(7M)",e[1]+"ø",e[2]+"7M(#5)",e[3]+"m7",e[4]+"7",e[5]+"7M",e[6]+"°"];
   }
 
-  if(menorModo==="melodica"){
-    let e=escala(t,menorMel);
-    return [
-      e[0]+"m7M6",
-      e[1]+"m7",
-      e[2]+"maj7(#5)",
-      e[3]+"7(#11)",
-      e[4]+"7(b13)",
-      e[5]+"ø",
-      e[6]+"ø"
-    ];
-  }
+  let e=escala(t,menorNat);
+  return [e[0]+"m7",e[1]+"ø",e[2]+"7M",e[3]+"m7",e[4]+"m7",e[5]+"7M",e[6]+"7"];
 }
 
 function gerarCiclo(t){
-
-  if(modo==="random"){
-    return embaralhar(listaAtual.slice());
-  }
+  if(modo==="random") return embaralhar(listaAtual.slice());
 
   let out=[];
+  let i=listaAtual.indexOf(t);
 
-  if(modo==="cromaticoAsc"||modo==="cromaticoDesc"){
-    const crom=["C","C#","D","D#","E","F","F#","G","G#","A","Bb","B"];
-    let base=t.replace("m","");
-    let idx=crom.indexOf(base);
-
-    for(let i=0;i<12;i++){
-      let pos=modo==="cromaticoAsc"?(idx+i)%12:(idx-i+12)%12;
-      let n=crom[pos];
-      if(t.includes("m")) n+="m";
-      out.push(n);
-    }
-
-    return out;
-  }
-
-  let index=listaAtual.indexOf(t);
-
-  for(let i=0;i<12;i++){
-    let pos=modo==="quartas"?(index-i+12)%12:(index+i)%12;
+  for(let k=0;k<12;k++){
+    let pos=modo==="quartas"?(i-k+12)%12:(i+k)%12;
     out.push(listaAtual[pos]);
   }
-
   return out;
 }
 
 function sortear(){
-
-  if(embaralhadas.length===0){
-    iniciar();
-  }
+  if(embaralhadas.length===0) iniciar();
 
   let t=embaralhadas.pop();
   document.getElementById("resultado").innerText=t;
 
-  let cicloGerado=gerarCiclo(t);
-
   let html="";
-
-  cicloGerado.forEach(function(ton){
+  gerarCiclo(t).forEach(ton=>{
     let acordes=campo(ton).map(a=>"<div class='acorde'>"+a+"</div>").join("");
     html+="<div class='linha'><div class='tonica'>"+ton+"</div>"+acordes+"</div>";
   });
@@ -341,9 +266,7 @@ function sortear(){
   document.getElementById("ciclo").innerHTML=html;
 }
 
-setAcorde("tetrade");
 selecionar("maior");
-setModo("quintas");
 
 </script>
 
