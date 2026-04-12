@@ -53,16 +53,21 @@ button:hover { background: #eceff1; }
   border: none;
 }
 
-#resultado {
-  font-size: 34px;
+#tituloOrdem {
+  margin-top: 15px;
+  font-size: 18px;
   font-weight: 600;
-  margin-top: 12px;
+}
+
+#ordem {
+  margin-top: 6px;
+  font-size: 20px;
 }
 
 #armadura {
-  font-size: 18px;
+  font-size: 16px;
   margin-top: 4px;
-  color: #444;
+  color: #555;
 }
 
 #ciclo {
@@ -133,8 +138,10 @@ button:hover { background: #eceff1; }
 <button id="sortear" onclick="sortear()">Sortear</button><br>
 <button id="zerar" onclick="resetar()">Zerar</button>
 
-<div id="resultado">—</div>
+<div id="tituloOrdem">Ordem do dia</div>
+<div id="ordem">—</div>
 <div id="armadura"></div>
+
 <div id="ciclo"></div>
 
 <script>
@@ -216,7 +223,7 @@ function iniciar(){
 
 function resetar(){
   iniciar();
-  document.getElementById("resultado").innerText="—";
+  document.getElementById("ordem").innerText="—";
   document.getElementById("ciclo").innerHTML="";
   document.getElementById("armadura").innerText="";
 }
@@ -227,6 +234,14 @@ function mostrarArmadura(t){
   if(!arm){document.getElementById("armadura").innerText="";return;}
   let s=arm.tipo==="#"?"♯":"♭";
   document.getElementById("armadura").innerText = arm.qtd===0?"sem acidentes":s.repeat(arm.qtd);
+}
+
+function corrigirEnarmonia(n){
+  return n
+    .replace("E#","F")
+    .replace("B#","C")
+    .replace("Cb","B")
+    .replace("Fb","E");
 }
 
 function nota(letra, alvo, usarBemol){
@@ -258,7 +273,7 @@ function escala(t,ints){
   for(let i=0;i<7;i++){
     let letra=letras[(idx+i)%7];
     let alvo=(semi+ints[i])%12;
-    esc.push(nota(letra,alvo,usarBemol));
+    esc.push(corrigirEnarmonia(nota(letra,alvo,usarBemol)));
   }
   return esc;
 }
@@ -316,7 +331,7 @@ function gerarCiclo(t){
       let pos=modo==="cromaticoAsc"?(idx+i)%12:(idx-i+12)%12;
       let n=crom[pos];
       if(t.includes("m")) n+="m";
-      out.push(n);
+      out.push(corrigirEnarmonia(n));
     }
     return out;
   }
@@ -335,12 +350,14 @@ function sortear(){
   if(embaralhadas.length===0) iniciar();
 
   let t=embaralhadas.pop();
-  document.getElementById("resultado").innerText=t;
+
+  let ordemAtual = gerarCiclo(t);
+  document.getElementById("ordem").innerText = ordemAtual.join(" → ");
+
   mostrarArmadura(t);
 
   let html="";
-
-  gerarCiclo(t).forEach(function(ton){
+  ordemAtual.forEach(function(ton){
     let acordes=campo(ton).map(a=>"<div class='acorde'>"+a+"</div>").join("");
     html+="<div class='linha'><div class='tonica'>"+ton+"</div>"+acordes+"</div>";
   });
