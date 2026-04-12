@@ -26,7 +26,6 @@ button {
   border: 1px solid #bbb;
   background: #ffffff;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 button:hover { background: #eceff1; }
@@ -34,7 +33,6 @@ button:hover { background: #eceff1; }
 .ativo {
   background: #2b2b2b;
   color: white;
-  border-color: #2b2b2b;
 }
 
 #sortear {
@@ -43,9 +41,8 @@ button:hover { background: #eceff1; }
   height: 80px;
   border-radius: 50%;
   background: #b71c1c;
-  color: #ffffff;
+  color: #fff;
   border: none;
-  font-size: 15px;
   font-weight: 600;
 }
 
@@ -62,49 +59,46 @@ button:hover { background: #eceff1; }
   margin-top: 12px;
 }
 
+#armadura {
+  font-size: 18px;
+  margin-top: 4px;
+  color: #444;
+}
+
 #ciclo {
   margin-top: 18px;
   max-width: 1100px;
   margin-inline: auto;
 }
 
-/* LINHA */
 .linha {
   display: grid;
   grid-template-columns: 110px repeat(7, 1fr);
-  gap: 0; /* importante pra alinhar divisórias */
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 6px;
 }
 
-/* zebra suave */
-.linha:nth-child(even) { background-color: #edf2f7; }
-.linha:nth-child(odd) { background-color: #ffffff; }
+.linha:nth-child(even) { background: #edf2f7; }
+.linha:nth-child(odd) { background: #fff; }
 
-/* TÔNICA */
 .tonica {
   font-weight: 700;
   font-size: 22px;
   text-align: left;
   padding: 8px 12px;
   border-right: 3px solid #c8d0d8;
-  color: #111;
 }
 
-/* ACORDES */
 .acorde {
   text-align: center;
   font-size: 22px;
-  font-weight: 500;
   padding: 8px 10px;
 }
 
-/* divisórias finas entre acordes */
 .acorde:not(:last-child) {
   border-right: 1px solid #d6dde5;
 }
-
 </style>
 </head>
 
@@ -123,9 +117,9 @@ button:hover { background: #eceff1; }
 </div>
 
 <div id="submenuMenor" style="display:none;">
-  <button id="btn-natural" onclick="setMenorModo('natural')">Menor natural</button>
-  <button id="btn-harmonica" onclick="setMenorModo('harmonica')">Menor harmônica</button>
-  <button id="btn-melodica" onclick="setMenorModo('melodica')">Menor melódica</button>
+  <button id="btn-natural" onclick="setMenorModo('natural')">Natural</button>
+  <button id="btn-harmonica" onclick="setMenorModo('harmonica')">Harmônica</button>
+  <button id="btn-melodica" onclick="setMenorModo('melodica')">Melódica</button>
 </div>
 
 <div>
@@ -133,22 +127,36 @@ button:hover { background: #eceff1; }
   <button id="btn-quartas" onclick="setModo('quartas')">Quartas</button>
   <button id="btn-cromA" onclick="setModo('cromaticoAsc')">Crom ↑</button>
   <button id="btn-cromD" onclick="setModo('cromaticoDesc')">Crom ↓</button>
-  <button id="btn-random" onclick="setModo('random')">Randômico</button>
+  <button id="btn-random" onclick="setModo('random')">Rand</button>
 </div>
 
 <button id="sortear" onclick="sortear()">Sortear</button><br>
 <button id="zerar" onclick="resetar()">Zerar</button>
 
 <div id="resultado">—</div>
+<div id="armadura"></div>
 <div id="ciclo"></div>
 
 <script>
 
-/* JS mantido intacto */
-
 const ciclo = ["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
 
-let tipoAcorde="triade";
+const armaduras = {
+  "C":{tipo:"n",qtd:0},
+  "G":{tipo:"#",qtd:1},
+  "D":{tipo:"#",qtd:2},
+  "A":{tipo:"#",qtd:3},
+  "E":{tipo:"#",qtd:4},
+  "B":{tipo:"#",qtd:5},
+  "F#":{tipo:"#",qtd:6},
+  "Db":{tipo:"b",qtd:5},
+  "Ab":{tipo:"b",qtd:4},
+  "Eb":{tipo:"b",qtd:3},
+  "Bb":{tipo:"b",qtd:2},
+  "F":{tipo:"b",qtd:1}
+};
+
+let tipoAcorde="tetrade";
 let listaAtual=[];
 let embaralhadas=[];
 let modo="quintas";
@@ -161,41 +169,31 @@ function limparAtivos(ids){
   ids.forEach(id=>document.getElementById(id).classList.remove("ativo"));
 }
 
-function setAcorde(tipo){
-  tipoAcorde=tipo;
+function setAcorde(t){
+  tipoAcorde=t;
   limparAtivos(["btn-triade","btn-tetrade"]);
-  document.getElementById("btn-"+tipo).classList.add("ativo");
+  document.getElementById("btn-"+t).classList.add("ativo");
 }
 
-function selecionar(tipo){
+function selecionar(t){
   limparAtivos(["btn-maior","btn-menor"]);
 
-  if(tipo==="maior"){
+  if(t==="maior"){
     listaAtual=ciclo.slice();
     document.getElementById("submenuMenor").style.display="none";
-    document.getElementById("btn-maior").classList.add("ativo");
   } else {
     listaAtual=ciclo.map(n=>n+"m");
     document.getElementById("submenuMenor").style.display="block";
-    document.getElementById("btn-menor").classList.add("ativo");
   }
 
+  document.getElementById("btn-"+t).classList.add("ativo");
   iniciar();
 }
 
 function setModo(m){
   modo=m;
   limparAtivos(["btn-quintas","btn-quartas","btn-cromA","btn-cromD","btn-random"]);
-
-  const map={
-    quintas:"btn-quintas",
-    quartas:"btn-quartas",
-    cromaticoAsc:"btn-cromA",
-    cromaticoDesc:"btn-cromD",
-    random:"btn-random"
-  };
-
-  document.getElementById(map[m]).classList.add("ativo");
+  document.getElementById("btn-"+(m==="cromaticoAsc"?"cromA":m==="cromaticoDesc"?"cromD":m)).classList.add("ativo");
 }
 
 function setMenorModo(m){
@@ -209,7 +207,6 @@ function embaralhar(a){
     let j=Math.floor(Math.random()*(i+1));
     [a[i],a[j]]=[a[j],a[i]];
   }
-  return a;
 }
 
 function iniciar(){
@@ -221,93 +218,128 @@ function resetar(){
   iniciar();
   document.getElementById("resultado").innerText="—";
   document.getElementById("ciclo").innerHTML="";
+  document.getElementById("armadura").innerText="";
 }
 
-function nota(letra, alvo){
+function mostrarArmadura(t){
+  let base=t.replace("m","");
+  let arm=armaduras[base];
+  if(!arm){document.getElementById("armadura").innerText="";return;}
+  let s=arm.tipo==="#"?"♯":"♭";
+  document.getElementById("armadura").innerText = arm.qtd===0?"sem acidentes":s.repeat(arm.qtd);
+}
+
+function nota(letra, alvo, usarBemol){
   let base=semitons[letra];
-  let diff=(alvo-base+12)%12;
-  if(diff===0) return letra;
-  if(diff===1) return letra+"#";
-  if(diff===11) return letra+"b";
+  if(base%12===alvo) return letra;
+  if(usarBemol){
+    if((base+11)%12===alvo) return letra+"b";
+    if((base+1)%12===alvo) return letra+"#";
+  } else {
+    if((base+1)%12===alvo) return letra+"#";
+    if((base+11)%12===alvo) return letra+"b";
+  }
   return letra;
 }
 
-function escala(tonica,intervalos){
-  let base=tonica.replace("m","");
+function escala(t,ints){
+  let base=t.replace("m","");
   let l=base[0];
   let idx=letras.indexOf(l);
 
-  let baseSemi=semitons[l];
-  if(base.includes("#")) baseSemi++;
-  if(base.includes("b")) baseSemi--;
+  let usarBemol = armaduras[base]?.tipo==="b";
+
+  let semi=semitons[l];
+  if(base.includes("#")) semi++;
+  if(base.includes("b")) semi--;
+  semi=(semi+12)%12;
 
   let esc=[];
   for(let i=0;i<7;i++){
     let letra=letras[(idx+i)%7];
-    let alvo=(baseSemi+intervalos[i])%12;
-    esc.push(nota(letra,alvo));
+    let alvo=(semi+ints[i])%12;
+    esc.push(nota(letra,alvo,usarBemol));
   }
   return esc;
 }
 
 function campo(t){
+
   const maior=[0,2,4,5,7,9,11];
-  const menorNat=[0,2,3,5,7,8,10];
-  const menorHar=[0,2,3,5,7,8,11];
-  const menorMel=[0,2,3,5,7,9,11];
+  const nat=[0,2,3,5,7,8,10];
+  const har=[0,2,3,5,7,8,11];
+  const mel=[0,2,3,5,7,9,11];
+
+  let e;
 
   if(!t.includes("m")){
-    let e=escala(t,maior);
+    e=escala(t,maior);
     return [e[0]+"7M",e[1]+"m7",e[2]+"m7",e[3]+"7M",e[4]+"7",e[5]+"m7",e[6]+"ø"];
   }
 
   if(menorModo==="natural"){
-    let e=escala(t,menorNat);
+    e=escala(t,nat);
     return [e[0]+"m7",e[1]+"ø",e[2]+"7M",e[3]+"m7",e[4]+"m7",e[5]+"7M",e[6]+"7"];
   }
 
   if(menorModo==="harmonica"){
-    let e=escala(t,menorHar);
+    e=escala(t,har);
     return [e[0]+"m(7M)",e[1]+"ø",e[2]+"7M(#5)",e[3]+"m7",e[4]+"7",e[5]+"7M",e[6]+"°"];
   }
 
   if(menorModo==="melodica"){
-    let e=escala(t,menorMel);
-    return [
-      e[0]+"m7M6",
-      e[1]+"m7",
-      e[2]+"maj7(#5)",
-      e[3]+"7(#11)",
-      e[4]+"7(b13)",
-      e[5]+"ø",
-      e[6]+"ø"
-    ];
+    e=escala(t,mel);
+    return [e[0]+"m7M6",e[1]+"m7",e[2]+"maj7(#5)",e[3]+"7(#11)",e[4]+"7(b13)",e[5]+"ø",e[6]+"ø"];
   }
 }
 
 function gerarCiclo(t){
+
   if(modo==="random"){
     return embaralhar(listaAtual.slice());
   }
 
-  let out=[];
-  let index=listaAtual.indexOf(t);
+  if(modo==="cromaticoAsc"||modo==="cromaticoDesc"){
 
-  for(let i=0;i<12;i++){
-    let pos=modo==="quartas"?(index-i+12)%12:(index+i)%12;
-    out.push(listaAtual[pos]);
+    const sharp=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const flat=["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"];
+
+    let base=t.replace("m","");
+    let usarBemol=armaduras[base]?.tipo==="b";
+    let crom=usarBemol?flat:sharp;
+
+    let idx=crom.indexOf(base);
+    if(idx===-1){crom=sharp;idx=crom.indexOf(base);}
+
+    let out=[];
+    for(let i=0;i<12;i++){
+      let pos=modo==="cromaticoAsc"?(idx+i)%12:(idx-i+12)%12;
+      let n=crom[pos];
+      if(t.includes("m")) n+="m";
+      out.push(n);
+    }
+    return out;
   }
 
+  let i=listaAtual.indexOf(t);
+  let out=[];
+  for(let k=0;k<12;k++){
+    let p=modo==="quartas"?(i-k+12)%12:(i+k)%12;
+    out.push(listaAtual[p]);
+  }
   return out;
 }
 
 function sortear(){
+
   if(embaralhadas.length===0) iniciar();
 
   let t=embaralhadas.pop();
   document.getElementById("resultado").innerText=t;
+  mostrarArmadura(t);
 
   let html="";
+
   gerarCiclo(t).forEach(function(ton){
     let acordes=campo(ton).map(a=>"<div class='acorde'>"+a+"</div>").join("");
     html+="<div class='linha'><div class='tonica'>"+ton+"</div>"+acordes+"</div>";
